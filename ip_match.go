@@ -56,8 +56,8 @@ func filterIPs(filter, input []ipaddr.Prefix, nonmatch bool) []ipaddr.Prefix {
 	var res []ipaddr.Prefix
 	for _, ip := range input {
 		match := false
-		for _, net := range filter {
-			if net.Contains(&ip) {
+		for _, cidr := range filter {
+			if cidr.Contains(&ip) {
 				match = true
 				break
 			}
