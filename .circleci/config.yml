@@ -4,8 +4,6 @@ workflows:
   build:
     jobs:
       - build-latest
-      - build-1.12
-      - build-1.13
       - build-1.14
       - build-1.15
   scheduled:
@@ -18,8 +16,6 @@ workflows:
                 - master
     jobs:
       - build-latest
-      - build-1.12
-      - build-1.13
       - build-1.14
       - build-1.15
 
@@ -62,16 +58,6 @@ jobs:
                     ./ip_match -v -F test/filter_prefixes.txt test/iplist.txt > got.txt
                     diff -Naur test/output-nonmatching.txt got.txt
                     rm got.txt
-
-  build-1.12:
-    <<: *build-template
-    docker:
-      - image: circleci/golang:1.12
-
-  build-1.13:
-    <<: *build-template
-    docker:
-      - image: circleci/golang:1.13
 
   build-1.14:
     <<: *build-template
