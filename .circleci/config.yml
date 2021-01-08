@@ -42,7 +42,7 @@ jobs:
       - run:
           name: Check gofumpt formatting
           command: |
-                    go get -u mvdan.cc/gofumpt/gofumpt
+                    go get -u mvdan.cc/gofumpt
                     gofumpt -d .
                     [ -z "$(gofumpt -l .)" ]
       - run: go build
