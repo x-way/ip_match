@@ -40,11 +40,11 @@ jobs:
                     go get -u honnef.co/go/tools/cmd/staticcheck
                     staticcheck -checks all ./...
       - run:
-          name: Check gofumports formatting
+          name: Check gofumpt formatting
           command: |
-                    go get -u mvdan.cc/gofumpt/gofumports
-                    gofumports -d .
-                    [ -z "$(gofumports -l .)" ]
+                    go get -u mvdan.cc/gofumpt/gofumpt
+                    gofumpt -d .
+                    [ -z "$(gofumpt -l .)" ]
       - run: go build
       - run:
           name: Test matching
