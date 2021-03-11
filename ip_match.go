@@ -5,16 +5,14 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net"
 	"os"
 	"strings"
 
-	"github.com/mikioh/ipaddr"
+	"inet.af/netaddr"
 )
 
-func readFile(name string) ([]ipaddr.Prefix, []ipaddr.Prefix) {
-	var prefixesv6 []ipaddr.Prefix
-	var prefixesv4 []ipaddr.Prefix
+func readFile(name string) []netaddr.IPPrefix {
+	var prefixes []netaddr.IPPrefix
 	var f *os.File
 	if name == "-" {
 		f = os.Stdin
@@ -36,45 +34,42 @@ func readFile(name string) ([]ipaddr.Prefix, []ipaddr.Prefix) {
 				line = line + "/32"
 			}
 		}
-		_, ipNet, err := net.ParseCIDR(line)
+		prefix, err := netaddr.ParseIPPrefix(line)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if strings.Contains(line, ":") {
-			prefixesv6 = append(prefixesv6, *(ipaddr.NewPrefix(ipNet)))
-		} else {
-			prefixesv4 = append(prefixesv4, *(ipaddr.NewPrefix(ipNet)))
-		}
+		prefixes = append(prefixes, prefix)
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-	return prefixesv6, prefixesv4
+	return prefixes
 }
 
-func filterIPs(filter, input []ipaddr.Prefix, nonmatch bool) []ipaddr.Prefix {
-	var res []ipaddr.Prefix
-	for _, ip := range input {
+func filterIPs(filter, input []netaddr.IPPrefix, nonmatch bool) []netaddr.IPPrefix {
+	var res []netaddr.IPPrefix
+	for _, prefix := range input {
 		match := false
+		isv6 := prefix.IP.Is6()
 		for _, cidr := range filter {
-			if cidr.Contains(&ip) {
+			if isv6 != cidr.IP.Is6() {
+				continue
+			}
+			if cidr.Bits <= prefix.Bits && cidr.Contains(prefix.IP) {
 				match = true
 				break
 			}
 		}
 		if match != nonmatch {
-			res = append(res, ip)
+			res = append(res, prefix)
 		}
 	}
 	return res
 }
 
-func matchFile(filter6, filter4 []ipaddr.Prefix, nonmatch bool, inFile string) {
-	ips6, ips4 := readFile(inFile)
-	for _, ip := range filterIPs(filter6, ips6, nonmatch) {
-		fmt.Println(ip)
-	}
-	for _, ip := range filterIPs(filter4, ips4, nonmatch) {
+func matchFile(filter []netaddr.IPPrefix, nonmatch bool, inFile string) {
+	ips := readFile(inFile)
+	for _, ip := range filterIPs(filter, ips, nonmatch) {
 		fmt.Println(ip)
 	}
 }
@@ -89,13 +84,13 @@ func main() {
 		return
 	}
 
-	filter6, filter4 := readFile(*filterFile)
+	filter := readFile(*filterFile)
 
 	if len(flag.Args()) == 0 {
-		matchFile(filter6, filter4, *nonmatchFlag, "-")
+		matchFile(filter, *nonmatchFlag, "-")
 	} else {
 		for _, inFile := range flag.Args() {
-			matchFile(filter6, filter4, *nonmatchFlag, inFile)
+			matchFile(filter, *nonmatchFlag, inFile)
 		}
 	}
 }
