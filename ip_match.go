@@ -50,12 +50,12 @@ func filterIPs(filter, input []netaddr.IPPrefix, nonmatch bool) []netaddr.IPPref
 	var res []netaddr.IPPrefix
 	for _, prefix := range input {
 		match := false
-		isv6 := prefix.IP.Is6()
+		isv6 := prefix.IP().Is6()
 		for _, cidr := range filter {
-			if isv6 != cidr.IP.Is6() {
+			if isv6 != cidr.IP().Is6() {
 				continue
 			}
-			if cidr.Bits <= prefix.Bits && cidr.Contains(prefix.IP) {
+			if cidr.Bits() <= prefix.Bits() && cidr.Contains(prefix.IP()) {
 				match = true
 				break
 			}
