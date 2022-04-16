@@ -7,7 +7,7 @@ Filter IPs/networks by matching against a list of prefixes.
 ## Installation
 
 ```
-# go get github.com/x-way/ip_match
+# go install github.com/x-way/ip_match@latest
 ```
 
 ## Usage
