@@ -5,14 +5,13 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/netip"
 	"os"
 	"strings"
-
-	"inet.af/netaddr"
 )
 
-func readFile(name string) []netaddr.IPPrefix {
-	var prefixes []netaddr.IPPrefix
+func readFile(name string) []netip.Prefix {
+	var prefixes []netip.Prefix
 	var f *os.File
 	if name == "-" {
 		f = os.Stdin
@@ -34,7 +33,7 @@ func readFile(name string) []netaddr.IPPrefix {
 				line = line + "/32"
 			}
 		}
-		prefix, err := netaddr.ParseIPPrefix(line)
+		prefix, err := netip.ParsePrefix(line)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -46,16 +45,16 @@ func readFile(name string) []netaddr.IPPrefix {
 	return prefixes
 }
 
-func filterIPs(filter, input []netaddr.IPPrefix, nonmatch bool) []netaddr.IPPrefix {
-	var res []netaddr.IPPrefix
+func filterIPs(filter, input []netip.Prefix, nonmatch bool) []netip.Prefix {
+	var res []netip.Prefix
 	for _, prefix := range input {
 		match := false
-		isv6 := prefix.IP().Is6()
+		isv6 := prefix.Addr().Is6()
 		for _, cidr := range filter {
-			if isv6 != cidr.IP().Is6() {
+			if isv6 != cidr.Addr().Is6() {
 				continue
 			}
-			if cidr.Bits() <= prefix.Bits() && cidr.Contains(prefix.IP()) {
+			if cidr.Bits() <= prefix.Bits() && cidr.Contains(prefix.Addr()) {
 				match = true
 				break
 			}
@@ -67,7 +66,7 @@ func filterIPs(filter, input []netaddr.IPPrefix, nonmatch bool) []netaddr.IPPref
 	return res
 }
 
-func matchFile(filter []netaddr.IPPrefix, nonmatch bool, inFile string) {
+func matchFile(filter []netip.Prefix, nonmatch bool, inFile string) {
 	ips := readFile(inFile)
 	for _, ip := range filterIPs(filter, ips, nonmatch) {
 		fmt.Println(ip)
