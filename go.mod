@@ -1,3 +1,3 @@
 module github.com/x-way/ip_match
 
-go 1.20
+go 1.21
