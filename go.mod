@@ -1,3 +1,3 @@
 module github.com/x-way/ip_match
 
-go 1.23.0
+go 1.23.8
