@@ -1,6 +1,5 @@
 # ip_match
 [![CircleCI](https://circleci.com/gh/x-way/ip_match/tree/master.svg?style=svg)](https://circleci.com/gh/x-way/ip_match/tree/master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/x-way/ip_match)](https://goreportcard.com/report/github.com/x-way/ip_match)
 
 Filter IPs/networks by matching against a list of prefixes.
 
